@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Flow",
-    "slug": "Flow",
+    "name": "Subbyt",
+    "slug": "Subbyt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,16 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.subbyt.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a3a879bc-4a36-4334-8ecc-cdb2b860f861"
+      }
     }
   }
 }
