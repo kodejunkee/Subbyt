@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
+import * as Linking from "expo-linking";
 
 import HomeScreen from "./src/screens/HomeScreen";
 import SubscriptionsScreen from "./src/screens/SubscriptionsScreen";
@@ -40,8 +41,24 @@ const TabNavigator = () => {
 
 const NavigationRoot = () => {
   const { colors, isDark } = useTheme();
+
+  const linking: any = {
+    prefixes: [Linking.createURL('/')],
+    config: {
+      screens: {
+        Main: {
+          screens: {
+            Home: 'home',
+            Subscriptions: 'search',
+          }
+        },
+        AddSubscription: 'add',
+      },
+    },
+  };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Main" component={TabNavigator} />

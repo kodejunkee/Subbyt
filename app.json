@@ -2,6 +2,7 @@
   "expo": {
     "name": "Subbyt",
     "slug": "Subbyt",
+    "scheme": "subbyt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +26,21 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#4A7AFF"
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "SubbytWidget",
+              "label": "Subbyt",
+              "minWidth": 250,
+              "minHeight": 110,
+              "resizeMode": "horizontal|vertical",
+              "updatePeriodMillis": 3600000
+            }
+          ]
         }
       ]
     ],
