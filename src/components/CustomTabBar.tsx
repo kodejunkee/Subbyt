@@ -1,9 +1,76 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, TouchableOpacity, StyleSheet, Text, Animated } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+function TabBarButton({ 
+  isFocused, 
+  label, 
+  iconName, 
+  onPress, 
+  onLongPress, 
+  colors,
+  options
+}: any) {
+  const scale = useRef(new Animated.Value(isFocused ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: isFocused ? 1 : 0,
+      useNativeDriver: true,
+      friction: 5,
+      tension: 100,
+    }).start();
+  }, [isFocused, scale]);
+
+  const backgroundStyle = {
+    transform: [{ scale }],
+    opacity: scale.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1]
+    }),
+    backgroundColor: colors.primary,
+  };
+
+  const iconTranslateY = scale.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -2],
+  });
+
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityState={isFocused ? { selected: true } : {}}
+      accessibilityLabel={options.tabBarAccessibilityLabel}
+      testID={options.tabBarTestID}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={styles.tabItem}
+      activeOpacity={0.7}
+    >
+      <Animated.View style={[styles.iconContainer, { transform: [{ translateY: iconTranslateY }] }]}>
+        <Animated.View style={[styles.activeBackground, backgroundStyle]} />
+        <Ionicons 
+          name={iconName} 
+          size={24} 
+          color={isFocused ? '#ffffff' : colors.subtext} 
+          style={{ zIndex: 1 }}
+        />
+      </Animated.View>
+      <Text
+        style={[
+          styles.label,
+          { color: isFocused ? colors.primary : colors.subtext },
+          isFocused && { fontWeight: '600' }
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { colors } = useTheme();
@@ -49,40 +116,16 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
           else if (route.name === 'Settings') iconName = isFocused ? 'settings' : 'settings-outline';
 
           return (
-            <TouchableOpacity
+            <TabBarButton
               key={index}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              testID={(options as any).tabBarTestID as any}
+              isFocused={isFocused}
+              label={label as string}
+              iconName={iconName}
               onPress={onPress}
               onLongPress={onLongPress}
-              style={styles.tabItem}
-              activeOpacity={0.7}
-            >
-              <View style={styles.iconContainer}>
-                {isFocused && (
-                  <View
-                    style={[styles.activeBackground, { backgroundColor: colors.primary }]}
-                  />
-                )}
-                <Ionicons 
-                  name={iconName} 
-                  size={24} 
-                  color={isFocused ? '#ffffff' : colors.subtext} 
-                  style={{ zIndex: 1 }}
-                />
-              </View>
-              <Text
-                style={[
-                  styles.label,
-                  { color: isFocused ? colors.primary : colors.subtext },
-                  isFocused && { fontWeight: '600' }
-                ]}
-              >
-                {label as string}
-              </Text>
-            </TouchableOpacity>
+              colors={colors}
+              options={options}
+            />
           );
         })}
       </View>
