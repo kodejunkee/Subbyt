@@ -23,6 +23,7 @@ export interface AppSettings {
   preferredCurrency: string;
   exchangeRates: Record<string, number>;
   notificationsEnabled: boolean;
+  notificationTime: string; // "HH:mm" format
   ratesLastFetched: number; // Timestamp
   theme: "light" | "dark" | "system";
 }

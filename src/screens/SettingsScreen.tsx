@@ -5,6 +5,8 @@ import { ChevronRight, Globe, Bell, Info, Shield, Search, X, Check, Moon, Sun, M
 import { getSettings, saveSettings } from "../storage/storage";
 import { AppSettings } from "../types/subscription";
 import { useTheme } from "../context/ThemeContext";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { rescheduleAllNotifications } from "../utils/notifications";
 
 const IconGlobe = Globe as any;
 const IconBell = Bell as any;
@@ -23,6 +25,7 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -38,6 +41,30 @@ const SettingsScreen = () => {
     const updated = { ...settings, notificationsEnabled: value };
     setSettings(updated);
     await saveSettings(updated);
+    await rescheduleAllNotifications();
+  };
+
+  const onTimeChange = async (event: any, selectedDate?: Date) => {
+    setShowTimePicker(false);
+    if (event.type === "set" && selectedDate && settings) {
+      const hours = selectedDate.getHours().toString().padStart(2, '0');
+      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+      const timeString = `${hours}:${minutes}`;
+      
+      const updated = { ...settings, notificationTime: timeString };
+      setSettings(updated);
+      await saveSettings(updated);
+      await rescheduleAllNotifications();
+    }
+  };
+
+  const formatTime = (timeString: string) => {
+    if (!timeString) return "09:00 AM";
+    const [h, m] = timeString.split(":");
+    const hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    return `${hour12.toString().padStart(2, '0')}:${m} ${ampm}`;
   };
 
   const selectCurrency = async (code: string) => {
@@ -123,6 +150,38 @@ const SettingsScreen = () => {
           />
         </View>
 
+        {settings.notificationsEnabled && (
+          <TouchableOpacity style={[styles.item, { backgroundColor: colors.card }]} onPress={() => setShowTimePicker(true)}>
+            <View style={styles.itemLeft}>
+              <View style={[styles.iconBox, { backgroundColor: isDark ? colors.surface : "#FFF4EF" }]}>
+                <IconBell size={20} color={isDark ? colors.text : "#FF9F43"} />
+              </View>
+              <Text style={[styles.itemText, { color: colors.text }]}>Notification Time</Text>
+            </View>
+            <View style={styles.itemRight}>
+              <Text style={[styles.valueText, { color: colors.subtext }]}>{formatTime(settings.notificationTime)}</Text>
+              <IconChevronRight size={18} color={colors.subtext} />
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {showTimePicker && (
+          <DateTimePicker
+            value={(() => {
+              const d = new Date();
+              if (settings.notificationTime) {
+                const [h, m] = settings.notificationTime.split(":");
+                d.setHours(parseInt(h, 10), parseInt(m, 10), 0, 0);
+              }
+              return d;
+            })()}
+            mode="time"
+            is24Hour={false}
+            display="default"
+            onChange={onTimeChange}
+          />
+        )}
+
 
         <Text style={[styles.sectionLabel, { color: colors.subtext, marginTop: 32 }]}>App Info</Text>
         <TouchableOpacity style={[styles.item, { backgroundColor: colors.card }]}>
@@ -135,7 +194,10 @@ const SettingsScreen = () => {
           <IconChevronRight size={18} color={colors.subtext} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.item, { backgroundColor: colors.card }]}>
+        <TouchableOpacity 
+          style={[styles.item, { backgroundColor: colors.card }]}
+          onPress={() => navigation.navigate("PrivacyPolicy" as never)}
+        >
           <View style={styles.itemLeft}>
             <View style={[styles.iconBox, { backgroundColor: colors.surface }]}>
               <IconShield size={20} color={colors.subtext} />
@@ -152,6 +214,11 @@ const SettingsScreen = () => {
 
       <Modal visible={showCurrencyModal} animationType="slide" transparent>
         <View style={styles.modalBg}>
+          <TouchableOpacity 
+            style={StyleSheet.absoluteFill} 
+            activeOpacity={1} 
+            onPress={() => setShowCurrencyModal(false)} 
+          />
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Base Currency</Text>
@@ -204,6 +271,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingBottom: 110,
   },
   sectionLabel: {
     fontSize: 12,

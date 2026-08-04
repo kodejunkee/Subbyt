@@ -106,15 +106,15 @@ const BudgetScreen = () => {
           </View>
         </View>
 
-        <View style={[styles.previewCard, { backgroundColor: isDark ? colors.card : "#1A1A1A", borderColor: colors.border, borderWidth: isDark ? 1 : 0 }]}>
-          <Text style={styles.previewLabel}>Current Budget</Text>
+        <View style={[styles.previewCard, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}>
+          <Text style={[styles.previewLabel, { color: colors.subtext }]}>Current Budget</Text>
           <View style={styles.previewRow}>
             <CurrencyDisplay
               amount={parseFloat(amount) || 0}
               currency={settings.preferredCurrency}
-              style={styles.previewAmount}
+              style={[styles.previewAmount, { color: colors.text }]}
             />
-            <Text style={styles.previewCycle}>
+            <Text style={[styles.previewCycle, { color: colors.subtext }]}>
               {budget.type === "monthly" ? "per month" : "per year"}
             </Text>
           </View>
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
   },
   form: {
     padding: 20,
+    paddingBottom: 110,
   },
   infoCard: {
     backgroundColor: "#FFF",
@@ -249,11 +250,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     padding: 20,
     borderRadius: 16,
-    backgroundColor: "#1A1A1A",
   },
   previewLabel: {
     fontSize: 12,
-    color: "#999",
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 4,
@@ -265,12 +264,10 @@ const styles = StyleSheet.create({
   previewAmount: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#FFF",
     marginRight: 8,
   },
   previewCycle: {
     fontSize: 14,
-    color: "#999",
   },
 });
 

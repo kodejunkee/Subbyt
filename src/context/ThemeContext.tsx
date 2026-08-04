@@ -32,16 +32,16 @@ const lightColors: ThemeColors = {
 };
 
 const darkColors: ThemeColors = {
-  background: "#0F172A",
-  surface: "#1E293B",
-  text: "#F8FAFC",
-  subtext: "#94A3B8",
-  primary: "#6366F1",
-  accent: "#F59E0B",
-  border: "#334155",
-  card: "#1E293B",
-  error: "#FF4D4D",
-  success: "#00C853",
+  background: "#000000",
+  surface: "#1C1C1E",
+  text: "#FFFFFF",
+  subtext: "#8E8E93",
+  primary: "#4A7AFF",
+  accent: "#FF9F43",
+  border: "#38383A",
+  card: "#1C1C1E",
+  error: "#FF453A",
+  success: "#32D74B",
 };
 
 interface ThemeContextType {

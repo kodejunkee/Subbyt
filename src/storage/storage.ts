@@ -60,6 +60,7 @@ export const getSettings = async (): Promise<AppSettings> => {
           preferredCurrency: "USD",
           exchangeRates: { USD: 1 },
           notificationsEnabled: true,
+          notificationTime: "09:00",
           ratesLastFetched: 0,
           theme: "system",
         };
@@ -69,6 +70,7 @@ export const getSettings = async (): Promise<AppSettings> => {
       preferredCurrency: "USD",
       exchangeRates: { USD: 1 },
       notificationsEnabled: true,
+      notificationTime: "09:00",
       ratesLastFetched: 0,
       theme: "system",
     };

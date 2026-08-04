@@ -1,24 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { 
-  Trash2, Calendar, Music, Film, ShoppingCart, 
-  CreditCard, Gamepad2, Zap, Droplets, Flame, 
-  Smartphone, Wifi, Tv, Coffee, Dumbbell, 
-  GraduationCap, Heart, Scissors, Car, Home, 
-  Plane, Shield, Briefcase, Mail 
-} from "lucide-react-native";
+import { Trash2, Calendar } from "lucide-react-native";
 import { Subscription } from "../types/subscription";
 import CurrencyDisplay from "./CurrencyDisplay";
 import { formatDate, getDaysUntil } from "../utils/dateUtils";
 import { useTheme } from "../context/ThemeContext";
-
-const ICON_MAP: any = {
-  Music, Film, Shopping: ShoppingCart, Card: CreditCard,
-  Gaming: Gamepad2, Energy: Zap, Water: Droplets, Gas: Flame,
-  Mobile: Smartphone, Wifi, TV: Tv, Coffee, Dumbbell,
-  Education: GraduationCap, Health: Heart, Beauty: Scissors,
-  Car, Home, Travel: Plane, Security: Shield, Work: Briefcase, Mail
-};
+import { ICON_MAP } from "../utils/icons";
 
 interface Props {
   subscription: Subscription;
@@ -99,7 +86,7 @@ const SubscriptionItem: React.FC<Props> = ({ subscription, onDelete, onPress }) 
           onPress={() => onDelete(subscription.id)}
           style={styles.deleteButton}
         >
-          <IconTrash size={18} color="#FF6B6B" />
+          <IconTrash size={18} color={colors.subtext} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

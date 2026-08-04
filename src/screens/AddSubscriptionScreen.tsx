@@ -15,19 +15,17 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import { 
   ChevronDown, Calendar, X, Search, Check, 
-  Music, Film, ShoppingCart, CreditCard, Gamepad2, 
-  Zap, Droplets, Flame, Smartphone, Wifi, 
-  Tv, Coffee, Dumbbell, GraduationCap, Heart, 
-  Scissors, Car, Home, Plane, Shield, 
-  Briefcase, Mail, Image as ImageIcon, Camera
+  Image as ImageIcon, Camera
 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getSettings, saveSubscriptions, getSubscriptions } from "../storage/storage";
 import { Subscription, BillingCycle } from "../types/subscription";
 import { useTheme } from "../context/ThemeContext";
 import { scheduleSubscriptionReminders } from "../utils/notifications";
+import { ICON_LIST } from "../utils/icons";
 
 const IconX = X as any;
 const IconCalendar = Calendar as any;
@@ -36,31 +34,6 @@ const IconSearch = Search as any;
 const IconCheck = Check as any;
 const IconImage = ImageIcon as any;
 const IconCamera = Camera as any;
-
-const ICON_LIST = [
-  { name: "Music", icon: Music },
-  { name: "Film", icon: Film },
-  { name: "Shopping", icon: ShoppingCart },
-  { name: "Card", icon: CreditCard },
-  { name: "Gaming", icon: Gamepad2 },
-  { name: "Energy", icon: Zap },
-  { name: "Water", icon: Droplets },
-  { name: "Gas", icon: Flame },
-  { name: "Mobile", icon: Smartphone },
-  { name: "Wifi", icon: Wifi },
-  { name: "TV", icon: Tv },
-  { name: "Coffee", icon: Coffee },
-  { name: "Dumbbell", icon: Dumbbell },
-  { name: "Education", icon: GraduationCap },
-  { name: "Health", icon: Heart },
-  { name: "Beauty", icon: Scissors },
-  { name: "Car", icon: Car },
-  { name: "Home", icon: Home },
-  { name: "Travel", icon: Plane },
-  { name: "Security", icon: Shield },
-  { name: "Work", icon: Briefcase },
-  { name: "Mail", icon: Mail },
-];
 
 const AddSubscriptionScreen = () => {
   const { colors, isDark } = useTheme();
@@ -81,7 +54,10 @@ const AddSubscriptionScreen = () => {
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [showIconModal, setShowIconModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [iconSearchQuery, setIconSearchQuery] = useState("");
   const [availableCurrencies, setAvailableCurrencies] = useState<string[]>([]);
+  const [nameError, setNameError] = useState("");
+  const [priceError, setPriceError] = useState("");
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -115,7 +91,16 @@ const AddSubscriptionScreen = () => {
   };
 
   const handleSave = async () => {
-    if (!name || !price || isNaN(parseFloat(price))) return;
+    let hasError = false;
+    if (!name) {
+      setNameError("Please enter a name");
+      hasError = true;
+    }
+    if (!price || isNaN(parseFloat(price))) {
+      setPriceError("Please enter a valid price");
+      hasError = true;
+    }
+    if (hasError) return;
 
     const subscriptions = await getSubscriptions();
     const newSub: Subscription = {
@@ -145,6 +130,10 @@ const AddSubscriptionScreen = () => {
 
   const filteredCurrencies = availableCurrencies.filter((c) =>
     c.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredIcons = ICON_LIST.filter(item => 
+    item.name.toLowerCase().includes(iconSearchQuery.toLowerCase())
   );
 
   return (
@@ -200,25 +189,41 @@ const AddSubscriptionScreen = () => {
         <View style={styles.inputGroup}>
           <Text style={[styles.label, { color: colors.subtext }]}>Name</Text>
           <TextInput
-            style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+            style={[
+              styles.input, 
+              { backgroundColor: colors.surface, color: colors.text },
+              nameError ? { borderWidth: 1, borderColor: colors.error } : null
+            ]}
             placeholder="Netflix, Spotify, etc."
             placeholderTextColor={colors.subtext}
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              if (nameError) setNameError("");
+            }}
           />
+          {nameError ? <Text style={[styles.errorText, { color: colors.error }]}>{nameError}</Text> : null}
         </View>
 
         <View style={styles.row}>
           <View style={[styles.inputGroup, { flex: 2, marginRight: 12 }]}>
             <Text style={[styles.label, { color: colors.subtext }]}>Price</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+              style={[
+                styles.input, 
+                { backgroundColor: colors.surface, color: colors.text },
+                priceError ? { borderWidth: 1, borderColor: colors.error } : null
+              ]}
               placeholder="0.00"
               placeholderTextColor={colors.subtext}
               value={price}
-              onChangeText={setPrice}
+              onChangeText={(text) => {
+                setPrice(text);
+                if (priceError) setPriceError("");
+              }}
               keyboardType="decimal-pad"
             />
+            {priceError ? <Text style={[styles.errorText, { color: colors.error }]}>{priceError}</Text> : null}
           </View>
           <View style={[styles.inputGroup, { flex: 1 }]}>
             <Text style={[styles.label, { color: colors.subtext }]}>Currency</Text>
@@ -308,6 +313,11 @@ const AddSubscriptionScreen = () => {
 
       <Modal visible={showCurrencyModal} animationType="slide" transparent>
         <View style={styles.modalBg}>
+          <TouchableOpacity 
+            style={StyleSheet.absoluteFill} 
+            activeOpacity={1} 
+            onPress={() => setShowCurrencyModal(false)} 
+          />
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Select Currency</Text>
@@ -315,7 +325,7 @@ const AddSubscriptionScreen = () => {
                 <IconX size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
-            <View style={[styles.searchBar, { backgroundColor: colors.background }]}>
+            <View style={[styles.searchBar, { backgroundColor: colors.background, marginBottom: 16 }]}>
               <IconSearch size={18} color={colors.subtext} style={{ marginRight: 8 }} />
               <TextInput
                 placeholder="Search..."
@@ -347,26 +357,46 @@ const AddSubscriptionScreen = () => {
 
       <Modal visible={showIconModal} animationType="slide" transparent>
         <View style={styles.modalBg}>
+          <TouchableOpacity 
+            style={StyleSheet.absoluteFill} 
+            activeOpacity={1} 
+            onPress={() => {
+              setShowIconModal(false);
+              setIconSearchQuery("");
+            }} 
+          />
           <View style={[styles.modalContent, { backgroundColor: colors.surface, height: "60%" }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Choose Icon</Text>
-              <TouchableOpacity onPress={() => setShowIconModal(false)}>
+              <TouchableOpacity onPress={() => {
+                setShowIconModal(false);
+                setIconSearchQuery("");
+              }}>
                 <IconX size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
             
-            <View style={styles.iconOptionsRow}>
+            <View style={styles.searchAndUploadRow}>
+              <View style={[styles.searchBar, { flex: 1, backgroundColor: colors.background, marginRight: 12 }]}>
+                <IconSearch size={18} color={colors.subtext} style={{ marginRight: 8 }} />
+                <TextInput
+                  placeholder="Search icons..."
+                  placeholderTextColor={colors.subtext}
+                  style={[styles.searchInput, { color: colors.text }]}
+                  value={iconSearchQuery}
+                  onChangeText={setIconSearchQuery}
+                />
+              </View>
               <TouchableOpacity 
-                style={[styles.imagePickerBtn, { borderColor: colors.border }]}
+                style={[styles.iconOnlyPickerBtn, { borderColor: colors.border }]}
                 onPress={pickImage}
               >
                 <IconImage size={24} color={colors.primary} />
-                <Text style={[styles.imagePickerBtnText, { color: colors.text }]}>Upload Photo</Text>
               </TouchableOpacity>
             </View>
 
             <FlatList
-              data={ICON_LIST}
+              data={filteredIcons}
               numColumns={4}
               keyExtractor={(item) => item.name}
               columnWrapperStyle={styles.iconGridRow}
@@ -382,6 +412,7 @@ const AddSubscriptionScreen = () => {
                       setSelectedIcon(item.name);
                       setCustomImage(undefined);
                       setShowIconModal(false);
+                      setIconSearchQuery("");
                     }}
                   >
                     <IconComp size={24} color={selectedIcon === item.name ? colors.primary : colors.subtext} />
@@ -492,6 +523,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
   },
+  errorText: {
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -551,13 +587,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
+  searchAndUploadRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 48,
-    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
@@ -574,22 +614,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-  iconOptionsRow: {
-    marginBottom: 20,
-  },
-  imagePickerBtn: {
-    flexDirection: "row",
-    alignItems: "center",
+  iconOnlyPickerBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: "center",
-    padding: 16,
-    borderRadius: 16,
+    alignItems: "center",
     borderWidth: 1,
     borderStyle: "dashed",
-  },
-  imagePickerBtnText: {
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "600",
   },
   iconGridRow: {
     justifyContent: "space-between",

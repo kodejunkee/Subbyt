@@ -39,7 +39,7 @@ export const registerForPushNotificationsAsync = async () => {
   }
 };
 
-import { getSettings } from "../storage/storage";
+import { getSettings, getSubscriptions } from "../storage/storage";
 
 export const scheduleSubscriptionReminders = async (subscription: Subscription) => {
   const settings = await getSettings();
@@ -48,6 +48,10 @@ export const scheduleSubscriptionReminders = async (subscription: Subscription) 
     await cancelSubscriptionReminders(subscription.id);
     return;
   }
+
+  const timeParts = (settings.notificationTime || "09:00").split(":");
+  const hours = parseInt(timeParts[0], 10) || 9;
+  const minutes = parseInt(timeParts[1], 10) || 0;
 
   const billingDate = new Date(subscription.nextBillingDate);
   const now = new Date();
@@ -61,7 +65,7 @@ export const scheduleSubscriptionReminders = async (subscription: Subscription) 
   for (const option of scheduleOptions) {
     const triggerDate = new Date(billingDate);
     triggerDate.setDate(triggerDate.getDate() - option.daysBefore);
-    triggerDate.setHours(9, 0, 0, 0); // Schedule for 9 AM
+    triggerDate.setHours(hours, minutes, 0, 0); // Use configured time
 
     const identifier = `${subscription.id}_${option.idSuffix}`;
 
@@ -91,3 +95,9 @@ export const cancelSubscriptionReminders = async (subscriptionId: string) => {
   }
 };
 
+export const rescheduleAllNotifications = async () => {
+  const subscriptions = await getSubscriptions();
+  for (const sub of subscriptions) {
+    await scheduleSubscriptionReminders(sub);
+  }
+};

@@ -39,16 +39,16 @@ const HomeScreen = () => {
       ]);
 
       const rates = await initializeExchangeRates();
-      
+
       const currentSettings = { ...storedSettings, exchangeRates: rates || storedSettings.exchangeRates };
 
       const calcTotals = calculateTotals(storedSubs, currentSettings.preferredCurrency, currentSettings.exchangeRates);
-      
+
       const status = getBudgetStatus(
         storedBudget.type === "monthly" ? calcTotals.monthlyTotal : calcTotals.yearlyTotal,
         storedBudget
       );
-      
+
       setSubscriptions(storedSubs);
       setBudget(storedBudget);
       setSettings(currentSettings);
@@ -61,6 +61,7 @@ const HomeScreen = () => {
         preferredCurrency: "USD",
         exchangeRates: { USD: 1 },
         notificationsEnabled: true,
+        notificationTime: "09:00",
         ratesLastFetched: 0,
         theme: "system"
       });
@@ -113,7 +114,7 @@ const HomeScreen = () => {
       >
         <View style={styles.header}>
           <View>
-            <Text style={[styles.greeting, { color: colors.text }]}>Hello, Subbyt!</Text>
+            <Text style={[styles.greeting, { color: colors.text }]}>Hi there!</Text>
             <Text style={[styles.date, { color: colors.subtext }]}>{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</Text>
           </View>
           <TouchableOpacity
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 110,
   },
   header: {
     flexDirection: "row",

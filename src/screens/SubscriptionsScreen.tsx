@@ -45,12 +45,6 @@ const SubscriptionsScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>All Subscriptions</Text>
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate("AddSubscription")}
-        >
-          <IconPlus color="#FFF" size={20} />
-        </TouchableOpacity>
       </View>
 
       <View style={[styles.searchContainer, { backgroundColor: colors.surface }]}>
@@ -83,6 +77,13 @@ const SubscriptionsScreen = () => {
           </View>
         }
       />
+
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => navigation.navigate("AddSubscription")}
+      >
+        <IconPlus color="#FFF" size={28} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -105,13 +106,20 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1A1A1A",
   },
-  addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#1A1A1A",
+  fab: {
+    position: 'absolute',
+    bottom: 110,
+    right: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   searchContainer: {
     flexDirection: "row",
@@ -138,7 +146,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 110,
   },
   emptyContainer: {
     padding: 40,

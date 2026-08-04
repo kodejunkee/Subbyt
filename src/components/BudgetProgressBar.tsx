@@ -35,7 +35,9 @@ const BudgetProgressBar: React.FC<Props> = ({ status }) => {
       </View>
       <View style={styles.footer}>
         <Text style={[styles.statusText, { color: colors.subtext }]}>
-          {status.status === "critical"
+          {status.budget <= 0
+            ? "No budget set yet"
+            : status.status === "critical"
             ? "Critical: Over Budget!"
             : status.status === "warning"
             ? "Warning: Approaching Limit"
