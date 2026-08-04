@@ -10,6 +10,26 @@ const STORAGE_KEYS = {
 export const saveSubscriptions = async (subscriptions: Subscription[]) => {
   try {
     await AsyncStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(subscriptions));
+    
+    // Trigger dynamic widget update
+    try {
+      const { widgetTaskHandler } = require('../widgets/widgetTaskHandler');
+      // Pass a dummy widgetInfo size so it triggers an update. Android respects the actual widget's dimensions internally when pushed.
+      widgetTaskHandler({
+        widgetAction: 'WIDGET_UPDATE',
+        widgetInfo: { widgetId: 0, widgetName: 'SubbytWidget', width: 250, height: 110 },
+        renderWidget: (component: any) => {
+          const { requestWidgetUpdate } = require('react-native-android-widget');
+          requestWidgetUpdate({
+            widgetName: 'SubbytWidget',
+            renderWidget: () => component,
+            widgetNotFound: () => {},
+          });
+        }
+      });
+    } catch (e) {
+      console.log('Failed to update widget dynamically', e);
+    }
   } catch (error) {
     console.error("Error saving subscriptions", error);
   }

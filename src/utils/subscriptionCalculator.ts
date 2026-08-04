@@ -98,9 +98,15 @@ export const performAutoRenewals = async () => {
 };
 
 export const getBudgetStatus = (
-  total: number,
-  budget: Budget
+  totalInBaseCurrency: number,
+  budget: Budget,
+  baseCurrency: string,
+  rates: Record<string, number>
 ): BudgetStatus => {
+  const budgetCurrency = budget.currency || baseCurrency;
+  
+  const total = convertCurrency(totalInBaseCurrency, baseCurrency, budgetCurrency, rates);
+
   const percentage = budget.amount > 0 ? (total / budget.amount) * 100 : 0;
   const remaining = Math.max(0, budget.amount - total);
 

@@ -26,6 +26,7 @@ import { Subscription, BillingCycle } from "../types/subscription";
 import { useTheme } from "../context/ThemeContext";
 import { scheduleSubscriptionReminders } from "../utils/notifications";
 import { ICON_LIST } from "../utils/icons";
+import { getCurrencySearchTerms, getCurrencyName } from "../utils/currencies";
 
 const IconX = X as any;
 const IconCalendar = Calendar as any;
@@ -129,7 +130,7 @@ const AddSubscriptionScreen = () => {
   };
 
   const filteredCurrencies = availableCurrencies.filter((c) =>
-    c.toLowerCase().includes(searchQuery.toLowerCase())
+    getCurrencySearchTerms(c).includes(searchQuery.toLowerCase())
   );
 
   const filteredIcons = ICON_LIST.filter(item => 
@@ -138,7 +139,7 @@ const AddSubscriptionScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
@@ -154,7 +155,7 @@ const AddSubscriptionScreen = () => {
       <ScrollView contentContainerStyle={styles.form}>
         <View style={styles.iconSelectionArea}>
           <TouchableOpacity 
-            style={[styles.mainIconContainer, { backgroundColor: colors.surface }]}
+            style={[styles.mainIconContainer, { backgroundColor: "transparent" }]}
             onPress={() => setShowIconModal(true)}
           >
             {customImage ? (
@@ -167,8 +168,10 @@ const AddSubscriptionScreen = () => {
             ) : selectedIcon ? (
               <View style={styles.iconPreviewContainer}>
                 {(() => {
-                  const IconComp = ICON_LIST.find(i => i.name === selectedIcon)?.icon as any;
-                  return IconComp ? <IconComp size={40} color={colors.primary} /> : <Text style={[styles.initialLarge, { color: colors.primary }]}>{name.charAt(0).toUpperCase() || "S"}</Text>;
+                  const item = ICON_LIST.find(i => i.name === selectedIcon);
+                  const IconComp = item?.icon as any;
+                  const iconColor = item?.color || colors.primary;
+                  return IconComp ? <IconComp size={96} color={iconColor} /> : <Text style={[styles.initialLarge, { color: colors.primary }]}>{name.charAt(0).toUpperCase() || "S"}</Text>;
                 })()}
                 <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
                   <IconCamera size={12} color="#FFF" />
@@ -346,7 +349,9 @@ const AddSubscriptionScreen = () => {
                     setShowCurrencyModal(false);
                   }}
                 >
-                  <Text style={[styles.currencyCode, { color: colors.text }]}>{item}</Text>
+                  <Text style={[styles.currencyCode, { color: colors.text }]}>
+                    {item} - {getCurrencyName(item)}
+                  </Text>
                   {currency === item && <IconCheck size={18} color={colors.primary} />}
                 </TouchableOpacity>
               )}
@@ -415,7 +420,7 @@ const AddSubscriptionScreen = () => {
                       setIconSearchQuery("");
                     }}
                   >
-                    <IconComp size={24} color={selectedIcon === item.name ? colors.primary : colors.subtext} />
+                    <IconComp size={24} color={item.color || (selectedIcon === item.name ? colors.primary : colors.subtext)} />
                   </TouchableOpacity>
                 );
               }}
@@ -466,11 +471,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   imagePreviewContainer: {
     width: "100%",
@@ -490,8 +490,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   initialLarge: {
-    fontSize: 40,
+    fontSize: 64,
     fontWeight: "700",
+    color: "#4A7aff",
   },
   editBadge: {
     position: "absolute",

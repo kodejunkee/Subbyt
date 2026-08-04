@@ -20,8 +20,8 @@ function TabBarButton({
     Animated.spring(scale, {
       toValue: isFocused ? 1 : 0,
       useNativeDriver: true,
-      friction: 5,
-      tension: 100,
+      friction: 8,
+      tension: 60,
     }).start();
   }, [isFocused, scale]);
 

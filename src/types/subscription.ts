@@ -15,8 +15,9 @@ export interface Subscription {
 }
 
 export interface Budget {
-  type: BillingCycle;
+  type: "monthly" | "yearly";
   amount: number;
+  currency?: string;
 }
 
 export interface AppSettings {

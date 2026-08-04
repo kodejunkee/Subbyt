@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { LogBox } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
@@ -42,6 +42,17 @@ const TabNavigator = () => {
 const NavigationRoot = () => {
   const { colors, isDark } = useTheme();
 
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      background: colors.background,
+      card: colors.card,
+      border: colors.border,
+      text: colors.text,
+    },
+  };
+
   const linking: any = {
     prefixes: [Linking.createURL('/')],
     config: {
@@ -58,9 +69,14 @@ const NavigationRoot = () => {
   };
 
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer linking={linking} theme={navigationTheme}>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator 
+        screenOptions={{ 
+          headerShown: false,
+          cardStyle: { backgroundColor: colors.background }
+        }}
+      >
         <Stack.Screen name="Main" component={TabNavigator} />
         <Stack.Screen
           name="AddSubscription"

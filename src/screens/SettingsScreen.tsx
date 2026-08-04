@@ -7,6 +7,7 @@ import { AppSettings } from "../types/subscription";
 import { useTheme } from "../context/ThemeContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { rescheduleAllNotifications } from "../utils/notifications";
+import { getCurrencySearchTerms, getCurrencyName } from "../utils/currencies";
 
 const IconGlobe = Globe as any;
 const IconBell = Bell as any;
@@ -79,7 +80,7 @@ const SettingsScreen = () => {
 
   const currencies = Object.keys(settings.exchangeRates).sort();
   const filteredCurrencies = currencies.filter((c) =>
-    c.toLowerCase().includes(searchQuery.toLowerCase())
+    getCurrencySearchTerms(c).includes(searchQuery.toLowerCase())
   );
 
   const themeOptions = [
@@ -241,7 +242,9 @@ const SettingsScreen = () => {
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity style={[styles.currencyItem, { borderBottomColor: colors.border }]} onPress={() => selectCurrency(item)}>
-                  <Text style={[styles.currencyCode, { color: colors.text }]}>{item}</Text>
+                  <Text style={[styles.currencyCode, { color: colors.text }]}>
+                    {item} - {getCurrencyName(item)}
+                  </Text>
                   {settings.preferredCurrency === item && <IconCheck size={18} color={colors.primary} />}
                 </TouchableOpacity>
               )}

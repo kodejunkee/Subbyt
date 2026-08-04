@@ -46,7 +46,9 @@ const HomeScreen = () => {
 
       const status = getBudgetStatus(
         storedBudget.type === "monthly" ? calcTotals.monthlyTotal : calcTotals.yearlyTotal,
-        storedBudget
+        storedBudget,
+        currentSettings.preferredCurrency,
+        currentSettings.exchangeRates
       );
 
       setSubscriptions(storedSubs);

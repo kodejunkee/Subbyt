@@ -5,7 +5,7 @@ import { Subscription } from "../types/subscription";
 import CurrencyDisplay from "./CurrencyDisplay";
 import { formatDate, getDaysUntil } from "../utils/dateUtils";
 import { useTheme } from "../context/ThemeContext";
-import { ICON_MAP } from "../utils/icons";
+import { ICON_MAP, ICON_COLOR_MAP } from "../utils/icons";
 
 interface Props {
   subscription: Subscription;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const SubscriptionItem: React.FC<Props> = ({ subscription, onDelete, onPress }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const daysUntil = getDaysUntil(subscription.nextBillingDate);
   const IconCalendar = Calendar as any;
   const IconTrash = Trash2 as any;
@@ -26,13 +26,14 @@ const SubscriptionItem: React.FC<Props> = ({ subscription, onDelete, onPress }) 
       activeOpacity={0.7}
     >
       <View style={styles.leftContent}>
-        <View style={[styles.initialContainer, { backgroundColor: colors.primary + "15" }]}>
+        <View style={[styles.initialContainer, { backgroundColor: "transparent" }]}>
           {subscription.customImage ? (
             <Image source={{ uri: subscription.customImage }} style={styles.iconImage} />
           ) : subscription.icon ? (
             (() => {
               const IconComp = ICON_MAP[subscription.icon];
-              return IconComp ? <IconComp size={24} color={colors.primary} /> : (
+              const iconColor = ICON_COLOR_MAP[subscription.icon] || colors.primary;
+              return IconComp ? <IconComp size={44} color={iconColor} /> : (
                 <Text style={[styles.initial, { color: colors.primary }]}>
                   {subscription.name.charAt(0).toUpperCase()}
                 </Text>
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   initial: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: "700",
     color: "#4A7aff",
   },
