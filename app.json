@@ -35,8 +35,10 @@
             {
               "name": "SubbytWidget",
               "label": "Subbyt",
-              "minWidth": 250,
-              "minHeight": 110,
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
               "resizeMode": "horizontal|vertical",
               "updatePeriodMillis": 3600000
             }
